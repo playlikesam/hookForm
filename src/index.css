@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-brandYellow font-sans min-h-screen;
+  }
+  html, body, #root {
+    @apply h-full w-full;
+  }
+}
+
+@layer components {
+  .form-card {
+    @apply bg-white/95 backdrop-blur-md rounded-xl p-10 sm:p-14 max-w-xl w-full shadow-card mx-auto border-2 border-silver font-sans;
+  }
+  .section-label {
+    @apply uppercase tracking-wider font-bold text-brandText mb-1 text-[0.95rem] sm:text-base;
+  }
+  .input-lg {
+    @apply w-full rounded-lg px-5 py-4 text-brandText bg-white border-2 border-silver outline-none focus:border-brandYellow focus:ring-2 focus:ring-brandYellow/60 text-base sm:text-lg transition;
+  }
+  .submit-btn {
+    @apply w-full mt-6 bg-gradient-to-r from-yellow-400 to-yellow-300 text-brandText font-extrabold py-4 text-lg rounded-lg shadow hover:bg-yellow-400 hover:-translate-y-[2px] transition-all duration-150 uppercase tracking-wide;
+  }
+  .brand-header {
+    @apply w-full rounded-xl bg-gradient-to-r from-silver to-gray-300 text-brandText text-lg font-bold py-6 text-center mb-8;
+  }
+}
