@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import ReactModal from "react-modal";
 
 interface QuestionData {
   id: string;
@@ -15,9 +16,10 @@ export default function QuestionForm() {
   const [email, setEmail] = useState('');
   const [donation, setDonation] = useState('');
   const [questions, setQuestions] = useState<QuestionData[]>([]);
+  const [showAdModal, setShowAdModal] = useState(false);
+  const [pendingQuestion, setPendingQuestion] = useState<QuestionData | null>(null);
 
   useEffect(() => {
-    // Load saved questions on component mount
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       setQuestions(JSON.parse(saved));
@@ -30,7 +32,6 @@ export default function QuestionForm() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     const newQuestion: QuestionData = {
       id: crypto.randomUUID(),
       question,
@@ -38,15 +39,21 @@ export default function QuestionForm() {
       donation,
       timestamp: Date.now(),
     };
+    setPendingQuestion(newQuestion);
+    setShowAdModal(true);
+  };
 
-    const updatedQuestions = [newQuestion, ...questions].slice(0, 10); // Keep max 10 recent questions
-
-    setQuestions(updatedQuestions);
-    saveQuestions(updatedQuestions);
-
-    setQuestion('');
-    setEmail('');
-    setDonation('');
+  const handleAdFinished = () => {
+    if (pendingQuestion) {
+      const updatedQuestions = [pendingQuestion, ...questions].slice(0, 10);
+      setQuestions(updatedQuestions);
+      saveQuestions(updatedQuestions);
+      setQuestion('');
+      setEmail('');
+      setDonation('');
+      setPendingQuestion(null);
+    }
+    setShowAdModal(false);
   };
 
   return (
@@ -107,6 +114,58 @@ export default function QuestionForm() {
           Submit Question
         </button>
       </form>
+
+      <ReactModal
+        isOpen={showAdModal}
+        onRequestClose={() => setShowAdModal(false)}
+        ariaHideApp={false}
+        style={{
+          overlay: {
+            backgroundColor: "rgba(0,0,0,0.7)",
+            zIndex: 1000,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          },
+          content: {
+            position: "relative",
+            inset: "auto",
+            maxWidth: 440,
+            width: "90%",
+            borderRadius: 20,
+            padding: "30px 25px",
+            boxShadow: "0 8px 24px rgba(0,0,0,0.3)",
+            textAlign: "center",
+            direction: "ltr",
+          },
+        }}
+      >
+        <div className="flex flex-col items-center">
+          <h2 className="text-2xl font-extrabold mb-4 text-primary-dark">
+            Rewarded Ad
+          </h2>
+
+          <p className="mb-6 text-gray-700 text-lg px-2">
+            Please watch this rewarded ad to complete your question submission.
+            <br />
+            (This is a simulation. A real AdMob video will appear here in production.)
+          </p>
+
+          <div className="w-full bg-gray-300 rounded-lg overflow-hidden relative h-4 mb-5">
+            <div
+              className="bg-primary absolute top-0 left-0 h-4 transition-all duration-[3000ms] ease-in-out"
+              style={{ width: showAdModal ? "100%" : "0%" }}
+            ></div>
+          </div>
+
+          <button
+            onClick={handleAdFinished}
+            className="submit-btn px-10 py-3 text-lg"
+          >
+            Finish Ad & Submit Question
+          </button>
+        </div>
+      </ReactModal>
 
       <section className="max-w-xl mx-auto mt-10 px-6 w-full">
         <h3 className="text-xl font-bold text-brandText mb-4">Recent Questions</h3>
